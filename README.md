@@ -1,96 +1,117 @@
-Nexo Money – AI-Powered Personal Finance Platform
 
-Nexo Money is a modern, AI-enhanced personal finance management platform designed to help users track expenses, manage accounts, plan budgets, and gain meaningful insights into their financial habits. Built using a full-stack architecture with a clean, intuitive UI and seamless user experience.
+# **📌 Nexo Money – AI-Powered Personal Finance Platform**
 
-🚀 Features
-🔹 Core Functionality
+Nexo Money is a modern, AI-enhanced personal finance management platform designed to help users track expenses, manage accounts, plan budgets, and gain meaningful insights into their financial habits. Built with a clean, intuitive UI and a seamless full-stack architecture.
 
-Expense & Income Tracking
+---
+
+# 🚀 **Features**
+
+## **🔹 Core Functionality**
+
+### **Expense & Income Tracking**
+
 Add, edit, and categorize your financial transactions with ease.
 
-Multi-Account Management
+### **Multi-Account Management**
+
 Manage multiple bank accounts (Savings, Current, etc.) and assign a default account for faster entry.
 
-Budget Planning
-Set monthly budgets and monitor your spending with a sleek progress indicator.
+### **Budget Planning**
 
-AI Receipt Scanner
-Upload receipts and let AI automatically extract the transaction details.
+Set monthly budgets and monitor your spending with a sleek visual progress indicator.
 
-Recurring Transactions
+### **AI Receipt Scanner**
+
+Upload receipts and let AI automatically extract transaction details.
+
+### **Recurring Transactions**
+
 Automate daily, weekly, monthly, or yearly recurring expenses/income.
 
-Financial Analytics Dashboard
-Visual insights using charts for category breakdowns, income vs expenses, and trends.
+### **Financial Analytics Dashboard**
 
-Monthly Email Reports
-Receive automated summaries + AI insights directly in your inbox.
+Visual insights using charts for:
 
-Budget Alerts
-Alerts when you approach or exceed your monthly budget.
+* Category-wise spending
+* Income vs expenses
+* Monthly trends
 
-🌟 User Experience
+### **Monthly Email Reports**
 
-Modern & Minimal UI
-Smooth, clean interface with thoughtfully designed components.
+Receive automated summaries + AI-generated financial insights.
 
-Dark Mode Support
+### **Budget Alerts**
+
+Get notified when approaching or exceeding your monthly budget limit.
+
+---
+
+# 🌟 **User Experience**
+
+### **Modern & Minimal UI**
+
+Smooth, clean, and professional interface engineered for usability.
+
+### **Dark Mode Support**
+
 Fully integrated theme switching with system preference detection.
 
-Responsive Design
-Works beautifully across desktop, tablet, and mobile.
+### **Responsive Design**
 
-Fast & Secure Authentication
-Powered by Clerk with seamless login, session handling, and account management.
+Looks beautiful on desktop, tablet, and mobile.
 
-🛠️ Tech Stack
-Frontend
+### **Fast & Secure Authentication**
 
-Next.js 15 (App Router)
+Powered by Clerk with seamless login, user management, and sessions.
 
-React 19
+---
 
-Tailwind CSS
+# 🛠️ **Tech Stack**
 
-Radix UI & ShadCN UI
+## **Frontend**
 
-Recharts
+* Next.js 15 (App Router)
+* React 19
+* Tailwind CSS
+* Radix UI + ShadCN UI
+* Recharts
+* React Hook Form + Zod
+* next-themes
 
-React Hook Form + Zod
+## **Backend & Services**
 
-next-themes
+* Prisma ORM
+* PostgreSQL (Supabase)
+* Clerk Authentication
+* Inngest (scheduled jobs & automation)
+* Google Gemini API (AI)
+* Resend (email delivery)
+* Arcjet (rate limiting & security)
 
-Backend & Services
+---
 
-Prisma ORM
+# 📦 **Installation**
 
-PostgreSQL (Supabase)
+### **1. Clone the repository**
 
-Clerk Authentication
+```bash
+git clone <repository-url>
+cd nexo-money
+```
 
-Inngest (scheduled jobs & automation)
+### **2. Install dependencies**
 
-Google Gemini API (AI features)
+```bash
+npm install
+```
 
-Resend (email delivery)
+### **3. Configure environment variables**
 
-Arcjet (security + rate limiting)
+Create a `.env.local` file:
 
-📦 Installation
-
-1. Clone the repo
-   git clone <repository-url>
-   cd nexo-money
-
-2. Install dependencies
-   npm install
-
-3. Add environment variables
-
-Create a .env.local:
-
+```env
 # Clerk
-
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
@@ -99,98 +120,102 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 
 # Database
-
 DATABASE_URL=
 DIRECT_URL=
 
 # AI
-
 GEMINI_API_KEY=
 
 # Email
-
 RESEND_API_KEY=
 
 # Background Jobs
-
 INNGEST_EVENT_KEY=
 INNGEST_SIGNING_KEY=
 
 # Security
-
 ARCJET_KEY=
+```
 
-4. Setup database
-   npx prisma generate
-   npx prisma migrate dev
+### **4. Setup database**
 
-5. Start development server
-   npm run dev
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
 
-📊 Key Modules
-📘 Transactions
+### **5. Start development server**
 
-CRUD functionality
+```bash
+npm run dev
+```
 
-Category tagging
+---
 
-Recurring scheduling
+# 📊 **Key Modules**
 
-AI-powered autofill from receipts
+## **📘 Transactions**
 
-🏦 Accounts
+* Create / edit / delete transactions
+* Category tagging
+* Recurring scheduling
+* AI-powered receipt extraction
 
-Multiple accounts
+## **🏦 Accounts**
 
-Default account selection
+* Multiple account support
+* Default account selection
+* Balance and history tracking
+* Per-account analytics
 
-Balance tracking
+## **📈 Analytics & Insights**
 
-Account-specific analytics
+* Income vs Expense bar charts
+* Category breakdown pie charts
+* Date range filters
+* Automated email summaries
 
-📈 Analytics & Insights
+## **📨 Email & Automation**
 
-Income vs Expense charts
+* Monthly financial reports
+* Budget alert emails
+* Inngest scheduled workflows
 
-Pie charts for spending categories
+---
 
-Time-based filtering
+# 🔐 **Authentication**
 
-Automated monthly email summaries
+Powered by **Clerk**:
 
-📨 Email & Automation
+* Email/password login
+* User profiles
+* Secure sessions
+* Automatic onboarding
 
-Monthly reports
+---
 
-Budget limit notifications
+# 🌙 **Dark Mode**
 
-Inngest-powered scheduled jobs
+* Auto system detection
+* Smooth transitions
+* Persistent theme preference
+* Fully themed UI
 
-🔐 Authentication
+---
 
-Powered by Clerk:
+# 🚀 **Deployment**
 
-Email/password login
+### **Build**
 
-User profiles
-
-Secure sessions
-
-Seamless dashboard redirection
-
-🌙 Dark Mode
-
-System-aware theme
-
-Persistent preference
-
-Smooth transitions
-
-Fully styled components for both themes
-
-🚀 Deployment
-Build
+```bash
 npm run build
+```
 
-Start
+### **Start**
+
+```bash
 npm start
+```
+
+
+
