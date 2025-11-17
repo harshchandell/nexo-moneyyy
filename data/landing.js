@@ -86,26 +86,30 @@ export const howItWorksData = [
 ];
 
 // Testimonials Data
+
 export const testimonialsData = [
   {
-    name: "Sarah Johnson",
-    role: "Small Business Owner",
-    image: "https://randomuser.me/api/portraits/women/75.jpg",
+    name: "Aryan Chandel",
+    role: "Entrepreneur",
+    image:
+      "/aryan.png",
     quote:
-      "Welth has transformed how I manage my business finances. The AI insights have helped me identify cost-saving opportunities I never knew existed.",
+      "Nexo money has completely changed how I monitor my monthly expenses. The AI insights helped me cut down unnecessary spending by 20% within weeks.",
   },
   {
-    name: "Michael Chen",
-    role: "Freelancer",
-    image: "https://randomuser.me/api/portraits/men/75.jpg",
+    name: "Priya Nair",
+    role: "Software Engineer",
+    image:
+      "/cat.jpg",
     quote:
-      "The receipt scanning feature saves me hours each month. Now I can focus on my work instead of manual data entry and expense tracking.",
+      "The automated receipt scanner is a lifesaver! Uploading bills and receipts is super smooth, and the accuracy is excellent.",
   },
   {
-    name: "Emily Rodriguez",
-    role: "Financial Advisor",
-    image: "https://randomuser.me/api/portraits/women/74.jpg",
+    name: "Madhav Verma",
+    role: "Financial Analyst",
+    image:
+      "/madhav.png",
     quote:
-      "I recommend Welth to all my clients. The multi-currency support and detailed analytics make it perfect for international investors.",
+      "I recommend Nexo money to all my clients. The budgeting and multi-account features make it perfect for Indian families managing multiple incomes and expenses.",
   },
 ];

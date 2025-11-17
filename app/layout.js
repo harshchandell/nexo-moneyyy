@@ -8,7 +8,7 @@ import ThemeProviderWrapper from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Welth",
+  title: "Nexo",
   description: "One stop Finance Platform",
 };
 
@@ -22,12 +22,14 @@ export default function RootLayout({ children }) {
         <body className={`${inter.className}`}>
           <ThemeProviderWrapper>
             <Header />
-            <main className="min-h-screen bg-white dark:bg-gray-900">{children}</main>
+            <main className="in-h-screen bg-white dark:bg-gray-900 pt-[64px]">{children}</main>
+            
+
             <Toaster richColors />
 
             <footer className="bg-blue-50 dark:bg-gray-800 py-12">
               <div className="container mx-auto px-4 text-center text-gray-600 dark:text-gray-300">
-                <p>Made with 💗 by RoadsideCoder</p>
+                <p>Coded with ☕ by Harsh Chandel</p>
               </div>
             </footer>
           </ThemeProviderWrapper>

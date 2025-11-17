@@ -6,6 +6,11 @@ const nextConfig = {
         protocol: "https",
         hostname: "randomuser.me",
       },
+      // This is the new, correct hostname you need to add
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
 
