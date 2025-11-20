@@ -3,9 +3,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import aj from "@/lib/arcjet";
 import { request } from "@arcjet/next";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -20,39 +20,29 @@ export async function createTransaction(data) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
-    // Get request data for ArcJet
+    // -----------------------------
+    // 🔐 Arcjet Rate Limiting
+    // -----------------------------
     const req = await request();
-
-    // Check rate limit
     const decision = await aj.protect(req, {
       userId,
-      requested: 1, // Specify how many tokens to consume
+      requested: 1,
     });
 
-    if (decision.isDenied()) {
-      if (decision.reason.isRateLimit()) {
-        const { remaining, reset } = decision.reason;
-        console.error({
-          code: "RATE_LIMIT_EXCEEDED",
-          details: {
-            remaining,
-            resetInSeconds: reset,
-          },
-        });
+    console.log("[Arcjet] Decision:", JSON.stringify(decision, null, 2));
 
+    if (decision.isDenied()) {
+      if (decision.reason?.isRateLimit()) {
         throw new Error("Too many requests. Please try again later.");
       }
-
-      throw new Error("Request blocked");
+      throw new Error("Request blocked by security policy.");
     }
+    // -----------------------------
 
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
     });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
+    if (!user) throw new Error("User not found");
 
     const account = await db.account.findUnique({
       where: {
@@ -60,16 +50,13 @@ export async function createTransaction(data) {
         userId: user.id,
       },
     });
+    if (!account) throw new Error("Account not found");
 
-    if (!account) {
-      throw new Error("Account not found");
-    }
-
-    // Calculate new balance
+    // Calculate balance change
     const balanceChange = data.type === "EXPENSE" ? -data.amount : data.amount;
     const newBalance = account.balance.toNumber() + balanceChange;
 
-    // Create transaction and update account balance
+    // Create transaction + update account
     const transaction = await db.$transaction(async (tx) => {
       const newTransaction = await tx.transaction.create({
         data: {
@@ -106,16 +93,11 @@ export async function getTransaction(id) {
   const user = await db.user.findUnique({
     where: { clerkUserId: userId },
   });
-
   if (!user) throw new Error("User not found");
 
   const transaction = await db.transaction.findUnique({
-    where: {
-      id,
-      userId: user.id,
-    },
+    where: { id, userId: user.id },
   });
-
   if (!transaction) throw new Error("Transaction not found");
 
   return serializeAmount(transaction);
@@ -129,40 +111,25 @@ export async function updateTransaction(id, data) {
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
     });
-
     if (!user) throw new Error("User not found");
 
-    // Get original transaction to calculate balance change
-    const originalTransaction = await db.transaction.findUnique({
-      where: {
-        id,
-        userId: user.id,
-      },
-      include: {
-        account: true,
-      },
+    const original = await db.transaction.findUnique({
+      where: { id, userId: user.id },
+      include: { account: true },
     });
+    if (!original) throw new Error("Transaction not found");
 
-    if (!originalTransaction) throw new Error("Transaction not found");
+    const oldChange =
+      original.type === "EXPENSE"
+        ? -original.amount.toNumber()
+        : original.amount.toNumber();
 
-    // Calculate balance changes
-    const oldBalanceChange =
-      originalTransaction.type === "EXPENSE"
-        ? -originalTransaction.amount.toNumber()
-        : originalTransaction.amount.toNumber();
+    const newChange = data.type === "EXPENSE" ? -data.amount : data.amount;
+    const netChange = newChange - oldChange;
 
-    const newBalanceChange =
-      data.type === "EXPENSE" ? -data.amount : data.amount;
-
-    const netBalanceChange = newBalanceChange - oldBalanceChange;
-
-    // Update transaction and account balance in a transaction
     const transaction = await db.$transaction(async (tx) => {
       const updated = await tx.transaction.update({
-        where: {
-          id,
-          userId: user.id,
-        },
+        where: { id, userId: user.id },
         data: {
           ...data,
           nextRecurringDate:
@@ -172,14 +139,9 @@ export async function updateTransaction(id, data) {
         },
       });
 
-      // Update account balance
       await tx.account.update({
         where: { id: data.accountId },
-        data: {
-          balance: {
-            increment: netBalanceChange,
-          },
-        },
+        data: { balance: { increment: netChange } },
       });
 
       return updated;
@@ -194,7 +156,6 @@ export async function updateTransaction(id, data) {
   }
 }
 
-// Get User Transactions
 export async function getUserTransactions(query = {}) {
   try {
     const { userId } = await auth();
@@ -203,22 +164,12 @@ export async function getUserTransactions(query = {}) {
     const user = await db.user.findUnique({
       where: { clerkUserId: userId },
     });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
+    if (!user) throw new Error("User not found");
 
     const transactions = await db.transaction.findMany({
-      where: {
-        userId: user.id,
-        ...query,
-      },
-      include: {
-        account: true,
-      },
-      orderBy: {
-        date: "desc",
-      },
+      where: { userId: user.id, ...query },
+      include: { account: true },
+      orderBy: { date: "desc" },
     });
 
     return { success: true, data: transactions };
@@ -230,22 +181,15 @@ export async function getUserTransactions(query = {}) {
 // Scan Receipt
 export async function scanReceipt(file) {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
+    const model = genAI.getGenerativeModel({
+      model: "gemini-pro",
+    });
 
-    // Convert File to ArrayBuffer
     const arrayBuffer = await file.arrayBuffer();
-    // Convert ArrayBuffer to Base64
     const base64String = Buffer.from(arrayBuffer).toString("base64");
 
     const prompt = `
-      Analyze this receipt image and extract the following information in JSON format:
-      - Total amount (just the number)
-      - Date (in ISO format)
-      - Description or items purchased (brief summary)
-      - Merchant/store name
-      - Suggested category (one of: housing,transportation,groceries,utilities,entertainment,food,shopping,healthcare,education,personal,travel,insurance,gifts,bills,other-expense )
-      
-      Only respond with valid JSON in this exact format:
+      Analyze this receipt image and extract JSON:
       {
         "amount": number,
         "date": "ISO date string",
@@ -253,44 +197,26 @@ export async function scanReceipt(file) {
         "merchantName": "string",
         "category": "string"
       }
-
-      If its not a recipt, return an empty object
+      If not a receipt, return {}.
     `;
 
     const result = await model.generateContent([
       {
-        inlineData: {
-          data: base64String,
-          mimeType: file.type,
-        },
+        inlineData: { data: base64String, mimeType: file.type },
       },
       prompt,
     ]);
 
     const response = await result.response;
-    const text = response.text();
-    const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
+    const cleaned = response.text().replace(/```json|```/g, "").trim();
 
-    try {
-      const data = JSON.parse(cleanedText);
-      return {
-        amount: parseFloat(data.amount),
-        date: new Date(data.date),
-        description: data.description,
-        category: data.category,
-        merchantName: data.merchantName,
-      };
-    } catch (parseError) {
-      console.error("Error parsing JSON response:", parseError);
-      throw new Error("Invalid response format from Gemini");
-    }
+    return JSON.parse(cleaned);
   } catch (error) {
-    console.error("Error scanning receipt:", error);
+    console.error("Scan error:", error);
     throw new Error("Failed to scan receipt");
   }
 }
 
-// Helper function to calculate next recurring date
 function calculateNextRecurringDate(startDate, interval) {
   const date = new Date(startDate);
 
