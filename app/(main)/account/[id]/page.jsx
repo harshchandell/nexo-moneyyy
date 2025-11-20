@@ -7,7 +7,12 @@ import { AccountChart } from "../_components/account-chart";
 import { formatCurrency } from "@/lib/currency";
 
 export default async function AccountPage({ params }) {
-  const accountData = await getAccountWithTransactions(params.id);
+  
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
+ 
+
+  const accountData = await getAccountWithTransactions(id);
 
   if (!accountData) {
     notFound();

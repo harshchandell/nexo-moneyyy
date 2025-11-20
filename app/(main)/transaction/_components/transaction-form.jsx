@@ -119,7 +119,7 @@ export function AddTransactionForm({
       reset();
       router.push(`/account/${transactionResult.data.accountId}`);
     }
-  }, [transactionResult, transactionLoading, editMode]);
+  }, [transactionResult, transactionLoading, editMode, reset, router]); 
 
   const type = watch("type");
   const isRecurring = watch("isRecurring");
@@ -315,7 +315,11 @@ export function AddTransactionForm({
         >
           Cancel
         </Button>
-        <Button type="submit" className="w-full rounded-lg" disabled={transactionLoading}>
+        <Button
+          type="submit"
+          className="w-full rounded-lg"
+          disabled={transactionLoading}
+        >
           {transactionLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
